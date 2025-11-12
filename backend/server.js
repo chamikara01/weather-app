@@ -58,8 +58,8 @@ function setCachedData(key, data) {
 }
 
 // Fetch weather data for a single city
-async function fetchWeatherForCity(cityName) {
-  const cacheKey = `weather_${cityName}`;
+async function fetchWeatherForCity(cityCode) {
+  const cacheKey = `weather_${cityCode}`;
   
   // Check cache first
   const cachedData = getCachedData(cacheKey);
@@ -69,8 +69,7 @@ async function fetchWeatherForCity(cityName) {
 
   // Fetch from OpenWeatherMap API
   try {
-    const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(cityName)}&appid=${OPENWEATHER_API_KEY}`;
-    console.log(`Fetching weather for ${cityName}...`);
+    const url = `https://api.openweathermap.org/data/2.5/weather?id=${cityCode}&appid=${OPENWEATHER_API_KEY}`;
     const response = await axios.get(url);
     
     // Cache the response
@@ -78,11 +77,7 @@ async function fetchWeatherForCity(cityName) {
     
     return response.data;
   } catch (error) {
-    console.error(`Error fetching weather for city ${cityName}:`, error.message);
-    if (error.response) {
-      console.error(`API Response Status: ${error.response.status}`);
-      console.error(`API Response Data:`, error.response.data);
-    }
+    console.error(`Error fetching weather for city ${cityCode}:`, error.message);
     throw error;
   }
 }
@@ -92,28 +87,28 @@ async function fetchWeatherForCity(cityName) {
 // Get weather data for all cities
 app.get('/api/weather', async (req, res) => {
   try {
-    const cityNames = cities.List.map(city => city.CityName);
+    const cityCodes = cities.List.map(city => city.CityCode);
     
     // Fetch weather data for all cities
-    const weatherPromises = cityNames.map(name => fetchWeatherForCity(name));
+    const weatherPromises = cityCodes.map(code => fetchWeatherForCity(code));
     const weatherData = await Promise.all(weatherPromises);
     
     res.json(weatherData);
   } catch (error) {
     console.error('Error in /api/weather:', error.message);
-    res.status(500).json({ error: 'Failed to fetch weather data', details: error.message });
+    res.status(500).json({ error: 'Failed to fetch weather data' });
   }
 });
 
 // Get weather data for a specific city
-app.get('/api/weather/:cityName', async (req, res) => {
+app.get('/api/weather/:cityCode', async (req, res) => {
   try {
-    const { cityName } = req.params;
-    const weatherData = await fetchWeatherForCity(cityName);
+    const { cityCode } = req.params;
+    const weatherData = await fetchWeatherForCity(cityCode);
     res.json(weatherData);
   } catch (error) {
-    console.error(`Error in /api/weather/${req.params.cityName}:`, error.message);
-    res.status(500).json({ error: 'Failed to fetch weather data', details: error.message });
+    console.error(`Error in /api/weather/${req.params.cityCode}:`, error.message);
+    res.status(500).json({ error: 'Failed to fetch weather data' });
   }
 });
 
