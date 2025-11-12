@@ -12,15 +12,6 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-// Auth0 JWT verification middleware (optional - for extra security)
-// Uncomment if you want to enforce JWT verification on backend
-/*
-const checkJwt = auth({
-  audience: 'https://your-tenant.us.auth0.com/api/v2/',
-  issuerBaseURL: 'https://your-tenant.us.auth0.com/',
-});
-*/
-
 // Configuration
 const OPENWEATHER_API_KEY = process.env.OPENWEATHER_API_KEY;
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
