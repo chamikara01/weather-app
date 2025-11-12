@@ -1,11 +1,12 @@
 // server.js
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
 const { auth } = require('express-oauth2-jwt-bearer');
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors());
@@ -21,8 +22,14 @@ const checkJwt = auth({
 */
 
 // Configuration
-const OPENWEATHER_API_KEY = '8a6f78cd63c665efe9bef89d308bf964';
+const OPENWEATHER_API_KEY = process.env.OPENWEATHER_API_KEY;
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+// Validate required environment variables
+if (!OPENWEATHER_API_KEY) {
+  console.error('ERROR: OPENWEATHER_API_KEY is not set in .env file');
+  process.exit(1);
+}
 
 // Cities data
 const cities = {
